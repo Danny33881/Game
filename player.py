@@ -1,3 +1,4 @@
+from music import *
 from bullet import *
 from background import *
 
@@ -36,6 +37,8 @@ class Player(pygame.sprite.Sprite):
         self.velocity_y = 0
         self.angle = 0
 
+        self.step_sound_timer = 0
+
     def player_rotation(self):
         mouse_coords = pygame.mouse.get_pos()
         x_change_mouse_player = (mouse_coords[0] - WIDTH // 2)
@@ -46,15 +49,20 @@ class Player(pygame.sprite.Sprite):
 
     def user_input(self):
         keys = pygame.key.get_pressed()
+        moving = False
 
         if keys[pygame.K_w]:
             self.velocity_y = -self.player_data['speedy']
+            moving = True
         if keys[pygame.K_s]:
             self.velocity_y = self.player_data['speedy']
+            moving =True
         if keys[pygame.K_d]:
             self.velocity_x = self.player_data['speedx']
+            moving = True
         if keys[pygame.K_a]:
             self.velocity_x = -self.player_data['speedx']
+            moving = True
 
         if self.velocity_x != 0 and self.velocity_y != 0:  # moving diagonally
             self.velocity_x /= math.sqrt(2)
@@ -66,6 +74,10 @@ class Player(pygame.sprite.Sprite):
         else:
             self.shoot = False
 
+        if moving and self.step_sound_timer == 0:
+            step_sound.play()
+            self.step_sound_timer = 15
+
     def is_shooting(self):
         if self.player_data['shoot_cooldown'] == 0:
             self.player_data['shoot_cooldown'] = game_settings['SHOOT_COOLDOWN']
@@ -73,6 +85,7 @@ class Player(pygame.sprite.Sprite):
             bullet = Bullet(spawn_bullet_pos[0], spawn_bullet_pos[1], self.angle, 'player')
             bullet_group.add(bullet)
             all_sprites_group.add(bullet)
+            shoot_sound.play()
 
     def move(self):
         self.pos += pygame.math.Vector2(self.velocity_x, self.velocity_y)
@@ -99,6 +112,7 @@ class Player(pygame.sprite.Sprite):
     def player_hurt(self):
         background.texture.blit(self.image_blood, self.rect)
         self.player_data['get_hurt_count'] += 1
+        damage_sound.play()
 
     def player_reset(self):
         self.player_data = {'score': 0, 'record': 0, 'get_hurt_count': 0, 'health_amount': 3, 'shoot_cooldown': 0,
@@ -114,6 +128,9 @@ class Player(pygame.sprite.Sprite):
 
         if self.player_data['shoot_cooldown'] > 0:
             self.player_data['shoot_cooldown'] -= 1
+
+        if self.step_sound_timer > 0:
+            self.step_sound_timer -= 1
 
 
 player = Player()

@@ -3,10 +3,11 @@ from all_sprites_group import all_sprites_group
 from player import player
 from bullet import *
 from random import randint
-from background import screen
+from background import *
 from camera import camera
 from HUD import text_group
 from HUD import font
+from music import *
 
 pygame.font.init()
 enemy_group = pygame.sprite.Group()
@@ -59,6 +60,9 @@ class Enemy(pygame.sprite.Sprite):
 
         self.position = pygame.math.Vector2(position)
 
+        self.image_blood = pygame.image.load('sprites/player/blood.png').convert_alpha()
+
+
     def hunt_player(self):
         if self.is_attacking == 0:
             player_vector = pygame.math.Vector2(player.hitbox_rect.center)
@@ -87,6 +91,7 @@ class Enemy(pygame.sprite.Sprite):
                     all_sprites_group.add(Loot(self.rect.x, self.rect.y, self.rareness))
                     player.player_data['enemy_killed'] += 1
                     self.kill()
+                    background.texture.blit(self.image_blood, self.rect)
 
         else:
             self.invincible -= 1
@@ -161,6 +166,7 @@ class Mage(Enemy):
         self.sheet_animation()
         self.image = self.images[0]
 
+
     def hunt_player(self):
         if self.is_attacking == 0:
             player_vector = pygame.math.Vector2(player.hitbox_rect.center)
@@ -191,6 +197,10 @@ class Mage(Enemy):
         bullet = Bullet(self.position.x, self.position.y, angle, 'enemy')
         enemy_bullet_group.add(bullet)
         all_sprites_group.add(bullet)
+        mage_shoot_sound.play()
+
+
+
 
 
 class Skeleton(Enemy):
@@ -203,6 +213,17 @@ class Skeleton(Enemy):
         self.images_attack = []
         self.sheet_animation()
         self.image = self.images[0]
+
+    def hunt_player(self):
+        if self.is_attacking == 0:
+            player_vector = pygame.math.Vector2(player.hitbox_rect.center)
+            enemy_vector = pygame.math.Vector2(self.rect.center)
+            distance = self.get_vector_distance(player_vector, enemy_vector)
+            if distance <= 5:
+                self.is_attacking = True
+                skeleton_attack_sound.play()
+            else:
+                super().hunt_player()
 
     def sheet_animation(self):
         sprite_sheet = pygame.image.load('sprites/enemy/skeleton_walk.png').convert_alpha()

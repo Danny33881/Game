@@ -1,5 +1,5 @@
 import pygame.time
-
+import pygame.mixer
 import all_sprites_group
 import player
 from enemy import *
@@ -8,6 +8,7 @@ from random import randint
 from HUD import *
 
 pygame.init()
+pygame.mixer.init()
 pygame.display.set_caption('Just Shoot')
 clock = pygame.time.Clock()
 
@@ -70,6 +71,7 @@ def reset_all():
 
 
 def game():
+    home_theme.stop()
     reset_all()
     call_count = 1
     spawn_speed = 40
@@ -104,6 +106,9 @@ def game():
 
 
 def game_start():
+    end_screenV.stop()
+    end_screenF.stop()
+    home_theme.play()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -133,8 +138,10 @@ def game_end():
     win_flag = player.player_data['wave'] == 4
     if win_flag:
         image = image_win
+        end_screenV.play()
     else:
         image = image_end
+        end_screenF.play()
 
     score = player.player_data['score']
     player.player_data['record'] = get_record('read')
