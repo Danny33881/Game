@@ -90,6 +90,7 @@ class Enemy(pygame.sprite.Sprite):
                     all_sprites_group.add(Loot(self.rect.x, self.rect.y, self.rareness))
                     player.player_data['enemy_killed'] += 1
                     self.kill()
+                    enemy_death_sound.play()
                     background.texture.blit(self.image_blood, self.rect)
 
         else:
@@ -145,6 +146,8 @@ class Enemy(pygame.sprite.Sprite):
         self.draw_enemy_health()
 
 
+
+
 class Mage(Enemy):
     def __init__(self, position):
         super().__init__(position)
@@ -198,6 +201,16 @@ class Goblin(Enemy):
         self.images_attack = []
         self.sheet_animation()
         self.image = self.images[0]
+
+    def hunt_player(self):
+        if self.is_attacking == 0:
+            player_vector = pygame.math.Vector2(player.hitbox_rect.center)
+            enemy_vector = pygame.math.Vector2(self.rect.center)
+            distance = self.get_vector_distance(player_vector, enemy_vector)
+            if distance <= 0:
+                self.is_attacking = True
+            else:
+                super().hunt_player()
 
     def sheet_animation(self):
         sprite_sheet = pygame.image.load('sprites/enemy/goblin_run.png').convert_alpha()

@@ -1,6 +1,7 @@
 from music import *
 from bullet import *
 from background import *
+import random
 
 
 def get_record(command, new_record=0):
@@ -78,7 +79,8 @@ class Player(pygame.sprite.Sprite):
             self.shoot = False
 
         if moving and self.step_sound_timer == 0:
-            step_sound.play()
+            f = [step_sound1, step_sound2]
+            random.choice(f).play()
             self.step_sound_timer = 15
 
     def is_shooting(self):
@@ -120,15 +122,19 @@ class Player(pygame.sprite.Sprite):
     def level_up(self):
         if self.player_data['score'] >= 20 and self.level == 1:
             self.level += 1
+            level_up_sound.play()
             self.player_data['damage'] += 5
         if self.player_data['score'] >= 50 and self.level == 2:
             self.level += 1
+            level_up_sound.play()
             self.player_data['damage'] += 5
         if self.player_data['score'] >= 90 and self.level == 3:
             self.level += 1
+            level_up_sound.play()
             self.player_data['damage'] += 10
         if self.player_data['score'] >= 140 and self.level == 4:
             self.level += 1
+            level_up_sound.play()
             self.player_data['damage'] += 10
 
     def player_reset(self):

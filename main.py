@@ -91,13 +91,10 @@ def game():
         if call_count == 1500 and player.player_data['wave'] == 1:
             player.player_data['wave'] += 1
             call_count = 0
-        if call_count == 2000 and player.player_data['wave'] == 1:
+        if call_count == 2000 and player.player_data['wave'] == 2:
             player.player_data['wave'] += 1
             call_count = 0
-        if call_count == 3000 and player.player_data['wave'] == 1:
-            player.player_data['wave'] += 1
-            call_count = 0
-        if call_count == 4500 and player.player_data['wave'] == 1:
+        if call_count == 3000 and player.player_data['wave'] == 3:
             player.player_data['wave'] += 1
             call_count = 0
 
