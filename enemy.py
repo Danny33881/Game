@@ -44,9 +44,8 @@ class Enemy(pygame.sprite.Sprite):
         self.is_attacking = False
         self.attack_timer = 0
         self.count_frames = 0
-
-        self.health = 100
         self.invincible = 0
+        self.health = 100
         self.rareness = 0
 
         self.collide = False
@@ -86,7 +85,7 @@ class Enemy(pygame.sprite.Sprite):
                 if sprite.rect.colliderect(self.rect):
                     self.collide = True
                     sprite.kill()
-                    self.health -= game_settings['PLAYER_DAMAGE']
+                    self.health -= player.player_data['damage']
                 if self.health <= 0:
                     all_sprites_group.add(Loot(self.rect.x, self.rect.y, self.rareness))
                     player.player_data['enemy_killed'] += 1
@@ -132,20 +131,9 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.image = self.animation_sprites[int(self.count_frames)]
 
-    def sheet_animation(self):
-        sprite_sheet = pygame.image.load('sprites/enemy/goblin_run.png').convert_alpha()
-        sprite_sheet_attack = pygame.image.load('sprites/enemy/goblin_attack.png').convert_alpha()
-        for i in range(8):
-            sprite_rect = pygame.Rect((i + self.animation_offset) % 8 * 35, 0, 35, 40)
-            sprite_image = sprite_sheet.subsurface(sprite_rect)
-            self.images.append(pygame.transform.rotozoom(sprite_image.convert_alpha(), 0, 1))
-        for i in range(8):
-            sprite_rect = pygame.Rect(i * 88, 0, 88, 46)
-            sprite_image_attack = sprite_sheet_attack.subsurface(sprite_rect)
-            self.images_attack.append(pygame.transform.rotozoom(sprite_image_attack.convert_alpha(), 0, 1))
-
     def get_vector_distance(self, vector_1, vector_2):
         return (vector_1 - vector_2).magnitude()
+
 
     def update(self):
         self.check_collision()
@@ -161,6 +149,7 @@ class Mage(Enemy):
     def __init__(self, position):
         super().__init__(position)
         self.rareness = 1
+        self.health = 100
         self.images = []
         self.images_attack = []
         self.sheet_animation()
@@ -200,6 +189,27 @@ class Mage(Enemy):
         mage_shoot_sound.play()
 
 
+class Goblin(Enemy):
+    def __init__(self, position):
+        super().__init__(position)
+        self.rareness = 0
+        self.health = 80
+        self.images = []
+        self.images_attack = []
+        self.sheet_animation()
+        self.image = self.images[0]
+
+    def sheet_animation(self):
+        sprite_sheet = pygame.image.load('sprites/enemy/goblin_run.png').convert_alpha()
+        sprite_sheet_attack = pygame.image.load('sprites/enemy/goblin_attack.png').convert_alpha()
+        for i in range(8):
+            sprite_rect = pygame.Rect((i + self.animation_offset) % 8 * 35, 0, 35, 40)
+            sprite_image = sprite_sheet.subsurface(sprite_rect)
+            self.images.append(pygame.transform.rotozoom(sprite_image.convert_alpha(), 0, 1))
+        for i in range(8):
+            sprite_rect = pygame.Rect(i * 88, 0, 88, 46)
+            sprite_image_attack = sprite_sheet_attack.subsurface(sprite_rect)
+            self.images_attack.append(pygame.transform.rotozoom(sprite_image_attack.convert_alpha(), 0, 1))
 
 
 
@@ -207,7 +217,7 @@ class Skeleton(Enemy):
     def __init__(self, position):
         super().__init__(position)
         self.rareness = 3
-        self.health = 125
+        self.health = 140
 
         self.images = []
         self.images_attack = []

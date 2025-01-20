@@ -24,9 +24,10 @@ class Player(pygame.sprite.Sprite):
         self.hitbox_rect = self.base_image.get_rect(center=self.pos)
         self.rect = self.hitbox_rect.copy()
         self.shoot = False
+        damage = game_settings['PLAYER_DAMAGE']
 
         self.player_data = {'score': 0, 'record': 0, 'get_hurt_count': 0, 'health_amount': 3, 'shoot_cooldown': 0,
-                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1}
+                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1, 'damage': damage}
 
         self.invincible = 0
         self.get_hurt_time = 0
@@ -36,6 +37,8 @@ class Player(pygame.sprite.Sprite):
         self.velocity_x = 0
         self.velocity_y = 0
         self.angle = 0
+
+        self.level = 1
 
         self.step_sound_timer = 0
 
@@ -114,9 +117,23 @@ class Player(pygame.sprite.Sprite):
         self.player_data['get_hurt_count'] += 1
         damage_sound.play()
 
+    def level_up(self):
+        if self.player_data['score'] >= 20 and self.level == 1:
+            self.level += 1
+            self.player_data['damage'] += 5
+        if self.player_data['score'] >= 50 and self.level == 2:
+            self.level += 1
+            self.player_data['damage'] += 5
+        if self.player_data['score'] >= 90 and self.level == 3:
+            self.level += 1
+            self.player_data['damage'] += 10
+        if self.player_data['score'] >= 140 and self.level == 4:
+            self.level += 1
+            self.player_data['damage'] += 10
+
     def player_reset(self):
         self.player_data = {'score': 0, 'record': 0, 'get_hurt_count': 0, 'health_amount': 3, 'shoot_cooldown': 0,
-                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1}
+                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1, 'damage': game_settings['PLAYER_DAMAGE']}
         self.pos = pygame.math.Vector2(game_settings['player_start_x'], game_settings['player_start_y'])
 
     def update(self):
@@ -125,6 +142,7 @@ class Player(pygame.sprite.Sprite):
         self.user_input()
         self.move()
         self.limit()
+        self.level_up()
 
         if self.player_data['shoot_cooldown'] > 0:
             self.player_data['shoot_cooldown'] -= 1

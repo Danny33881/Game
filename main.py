@@ -41,7 +41,7 @@ def enemy_spawn(spawn_speed, wave, call_count):
     if spawn_speed > 200:
         randomx, randomy = random_pos()
         if enemy_outside_camera(randomx, randomy):
-            Enemy((randomx, randomy))
+            Goblin((randomx, randomy))
         spawn_speed = 0
     if call_count % 200 == 0:
         randomx, randomy = random_pos()
@@ -88,7 +88,16 @@ def game():
         if player.player_data['get_hurt_count'] == player.player_data['health_amount']:
             return "game_end"
 
-        if call_count == 1500:
+        if call_count == 1500 and player.player_data['wave'] == 1:
+            player.player_data['wave'] += 1
+            call_count = 0
+        if call_count == 2000 and player.player_data['wave'] == 1:
+            player.player_data['wave'] += 1
+            call_count = 0
+        if call_count == 3000 and player.player_data['wave'] == 1:
+            player.player_data['wave'] += 1
+            call_count = 0
+        if call_count == 4500 and player.player_data['wave'] == 1:
             player.player_data['wave'] += 1
             call_count = 0
 
