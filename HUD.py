@@ -28,8 +28,12 @@ class HUD(pygame.sprite.Sprite):
     def text_draw(self):
         text_image_score = font.render('score:' + str(player.player_data['score']), True, game_settings['WHITE'])
         text_image_wave = font.render('wave:' + str(player.player_data['wave']), True, game_settings['WHITE'])
+        text_image_ammo = font.render(f"ammo:{player.player_data['ammo']}/{player.player_data['max_ammo']}", True, game_settings['WHITE'])
+        text_image_level = font.render('level:' + str(player.player_data['level']), True, game_settings['WHITE'])
         self.HUD_surface.blit(text_image_score, (10, 30))
         self.HUD_surface.blit(text_image_wave, (10, 60))
+        self.HUD_surface.blit(text_image_level, (10, 90))
+        self.HUD_surface.blit(text_image_ammo, (10, 120))
 
     def update(self):
         self.HUD_surface.fill((0, 0, 0, 0))

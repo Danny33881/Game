@@ -28,18 +28,22 @@ class Player(pygame.sprite.Sprite):
         damage = game_settings['PLAYER_DAMAGE']
 
         self.player_data = {'score': 0, 'record': 0, 'get_hurt_count': 0, 'health_amount': 3, 'shoot_cooldown': 0,
-                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1, 'damage': damage}
+                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1, 'damage': damage, 'level': 1,
+                            'ammo': 10, 'max_ammo': 10}
 
         self.invincible = 0
         self.get_hurt_time = 0
         self.death = False
         self.image_blood = pygame.image.load('sprites/player/blood.png').convert_alpha()
 
+        # Механика перезарядки
+        self.reloading = False  # Флаг перезарядки
+        self.reload_time = 100  # Время перезарядки в тиках
+        self.reload_timer = 0  # Таймер для перезарядки
+
         self.velocity_x = 0
         self.velocity_y = 0
         self.angle = 0
-
-        self.level = 1
 
         self.step_sound_timer = 0
 
@@ -68,6 +72,9 @@ class Player(pygame.sprite.Sprite):
             self.velocity_x = -self.player_data['speedx']
             moving = True
 
+        if keys[pygame.K_r]:
+            self.start_reload()
+
         if self.velocity_x != 0 and self.velocity_y != 0:  # moving diagonally
             self.velocity_x /= math.sqrt(2)
             self.velocity_y /= math.sqrt(2)
@@ -79,18 +86,25 @@ class Player(pygame.sprite.Sprite):
             self.shoot = False
 
         if moving and self.step_sound_timer == 0:
-            f = [step_sound1, step_sound2]
-            random.choice(f).play()
+            step_sound1.play()
             self.step_sound_timer = 15
 
     def is_shooting(self):
-        if self.player_data['shoot_cooldown'] == 0:
+        if self.player_data['shoot_cooldown'] == 0 and self.player_data['ammo'] > 0:
+            self.player_data['ammo'] -= 1
             self.player_data['shoot_cooldown'] = game_settings['SHOOT_COOLDOWN']
             spawn_bullet_pos = self.pos
             bullet = Bullet(spawn_bullet_pos[0], spawn_bullet_pos[1], self.angle, 'player')
             bullet_group.add(bullet)
             all_sprites_group.add(bullet)
             shoot_sound.play()
+
+    def start_reload(self):
+        reload_sound.stop()
+        reload_sound.play()
+        if not self.reloading:
+            self.reloading = True
+            self.reload_timer = self.reload_time
 
     def move(self):
         self.pos += pygame.math.Vector2(self.velocity_x, self.velocity_y)
@@ -120,26 +134,34 @@ class Player(pygame.sprite.Sprite):
         damage_sound.play()
 
     def level_up(self):
-        if self.player_data['score'] >= 20 and self.level == 1:
-            self.level += 1
+        if self.player_data['score'] >= 20 and self.player_data['level'] == 1:
             level_up_sound.play()
+            self.player_data['level'] += 1
             self.player_data['damage'] += 5
-        if self.player_data['score'] >= 50 and self.level == 2:
-            self.level += 1
+            self.player_data['max_ammo'] += 5
+
+        if self.player_data['score'] >= 50 and self.player_data['level'] == 2:
             level_up_sound.play()
-            self.player_data['damage'] += 5
-        if self.player_data['score'] >= 90 and self.level == 3:
-            self.level += 1
+            self.player_data['level'] += 1
+            self.player_data['max_ammo'] += 5
+            self.player_data['damage'] += 10
+
+        if self.player_data['score'] >= 90 and self.player_data['level'] == 3:
+            level_up_sound.play()
+            self.player_data['level'] += 1
+            self.player_data['max_ammo'] += 5
+            self.player_data['damage'] += 10
+
+        if self.player_data['score'] >= 140 and self.player_data['level'] == 4:
+            self.player_data['level'] += 1
             level_up_sound.play()
             self.player_data['damage'] += 10
-        if self.player_data['score'] >= 140 and self.level == 4:
-            self.level += 1
-            level_up_sound.play()
-            self.player_data['damage'] += 10
+            self.player_data['max_ammo'] += 10
 
     def player_reset(self):
         self.player_data = {'score': 0, 'record': 0, 'get_hurt_count': 0, 'health_amount': 3, 'shoot_cooldown': 0,
-                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1, 'damage': game_settings['PLAYER_DAMAGE']}
+                            'speedx': 6, 'speedy': 6, 'enemy_killed': 0, 'wave': 1,
+                            'damage': game_settings['PLAYER_DAMAGE'],'level': 1, 'ammo': 10, 'max_ammo': 10}
         self.pos = pygame.math.Vector2(game_settings['player_start_x'], game_settings['player_start_y'])
 
     def update(self):
@@ -152,6 +174,12 @@ class Player(pygame.sprite.Sprite):
 
         if self.player_data['shoot_cooldown'] > 0:
             self.player_data['shoot_cooldown'] -= 1
+
+        if self.reloading:
+            self.reload_timer -= 1
+            if self.reload_timer <= 0:
+                self.reloading = False
+                self.player_data['ammo'] = self.player_data['max_ammo']
 
         if self.step_sound_timer > 0:
             self.step_sound_timer -= 1

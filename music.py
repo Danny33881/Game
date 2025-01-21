@@ -14,6 +14,7 @@ end_screenV = pygame.mixer.Sound('sounds/Victory.mp3')
 goblin_attack_sound = pygame.mixer.Sound('sounds/goblin_attack.mp3')
 enemy_death_sound = pygame.mixer.Sound('sounds/enemy_death.mp3')
 level_up_sound = pygame.mixer.Sound('sounds/levelup.mp3')
+reload_sound = pygame.mixer.Sound('sounds/reload.mp3')
 
 # Настройка громкости звуков (по желанию)
 shoot_sound.set_volume(0.1)  # От 0.0 до 1.0
